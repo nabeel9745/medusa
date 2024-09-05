@@ -124,16 +124,18 @@ resource "aws_instance" "medusa" {
      #           linuxserver/medusa:latest
 
 #need to Create a docker-compose.yml File:
-///version: '3'
+///
+
+version: '3'
 
 services:
   medusa:
-    image: medusajs/medusa:latest
+    image: linuxserver/medusa
     container_name: medusa
     ports:
       - "3000:3000"
     environment:
-      DATABASE_URL: postgres://medusauser:11111@52-91-163-227:5432/medusa_db
+      DATABASE_URL: postgres://medusauser:you_password@postgres:5432/medusa_db
     depends_on:
       - postgres
 
@@ -142,10 +144,19 @@ services:
     container_name: postgres
     environment:
       POSTGRES_USER: medusauser
-      POSTGRES_PASSWORD: 11111
-      POSTGRES_DB: medusa
+      POSTGRES_PASSWORD: you_password
+      POSTGRES_DB: medusa_db
     volumes:
       - postgres_data:/var/lib/postgresql/data
+  node:
+    image: node:16  # You can replace '16' with any other version of Node.js (e.g., node:18)
+    container_name: node_app
+    volumes:
+      - .:/usr/src/app   # Mount the current directory to /usr/src/app in the container
+    working_dir: /usr/src/app  # Set the working directory inside the container
+    command: npm install  # Run `npm install` when the container starts
+    ports:
+      - "4000:4000"  # Expose port 3000 for the app (optional)
 
 volumes:
   postgres_data:
